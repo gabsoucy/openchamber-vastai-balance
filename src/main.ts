@@ -1,6 +1,8 @@
 import { connectHost } from "@openchamber/sdk";
 import { applyHostReady, mountButton } from "@openchamber/sdk/ui";
 import { CreditRefresh, type ViewState } from "./refresh.ts";
+import { observeAdaptiveHeight } from "./adaptive-height.ts";
+import { createStatusHeaderPublisher } from "./status-header.ts";
 
 const host = connectHost();
 const creditNode = document.querySelector<HTMLElement>("#credit")!;
@@ -13,6 +15,8 @@ const refreshButton = mountButton(refreshButtonRoot, {
   onClick: () => refresh.refresh(),
 });
 const money = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" });
+const statusHeader = createStatusHeaderPublisher((controls) => host.setStatusControls(controls));
+const layout = observeAdaptiveHeight(document.querySelector<HTMLElement>("main")!, (height) => host.setHeight(height));
 
 function render(state: ViewState): void {
   if (state.kind === "disconnected") {
@@ -29,14 +33,24 @@ function render(state: ViewState): void {
     detailNode.textContent = `Auto-top-up: Unknown · ${state.kind === "invalid" ? "Vast.ai rejected the key. Reconnect in Settings → Integrations." : "Could not refresh Vast.ai credit."}${state.lastSuccess ? ` Last successful refresh ${new Date(state.lastSuccess).toLocaleTimeString()}.` : ""}`;
   }
   refreshButton.update({ disabled: state.kind === "disconnected" || state.kind === "loading" || state.kind === "invalid" });
+  statusHeader.update(state);
+  layout.measure();
 }
 
 const refresh = new CreditRefresh(host, render);
-host.onReady((ctx) => applyHostReady(ctx, document.documentElement));
+host.onReady((ctx) => {
+  applyHostReady(ctx, document.documentElement);
+  layout.measure();
+  statusHeader.enable(ctx.features?.statusControls === true);
+});
 host.onConnection(({ connected, account }) => refresh.connection(connected, account));
 document.addEventListener("visibilitychange", () => refresh.visibilityChanged());
+window.addEventListener("resize", layout.measure);
 window.addEventListener("pagehide", () => {
   refresh.dispose();
+  layout.dispose();
+  window.removeEventListener("resize", layout.measure);
+  statusHeader.dispose();
   refreshButton.dispose();
   host.dispose();
 }, { once: true });
