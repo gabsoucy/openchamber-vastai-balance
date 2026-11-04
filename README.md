@@ -10,7 +10,7 @@ The extension makes only `GET /api/v0/users/current/` requests through OpenChamb
 
 Credit refreshes when the section opens or the account connects, on request with **Refresh**, and every 60 seconds while visible. Requests stop while hidden or disconnected. Failed refreshes preserve the last successful amount as stale; a missing or malformed credit is never presented as zero.
 
-The expanded section sizes itself to its content. On hosts that support status controls, its header shows the last fetched credit as a disabled **Cached** amount (or **Stale** after a failed refresh); this is not a live summary or refresh action. While collapsed, the frame is unmounted and cannot observe account changes, so the header may retain the prior amount until the section is reopened. The extension does not keep polling while collapsed. Older hosts without status-control support continue to show credit in the expanded section only.
+The expanded section sizes itself to its content. Credit is shown only while expanded: OpenChamber 2.6.0 unmounts the frame and removes its header controls when collapsed. A collapsed amount is deferred until the host supports it. The extension does not keep polling while collapsed.
 
 ## Development
 
