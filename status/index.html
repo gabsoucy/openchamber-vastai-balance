@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      :root { color-scheme: light dark; font: 13px/1.45 var(--oc-font, system-ui, sans-serif); }
+      body { margin: 0; color: var(--oc-fg, inherit); font-family: var(--oc-font, system-ui, sans-serif); }
+      main { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; }
+      #credit { font-size: 1.2rem; font-weight: 650; }
+      #detail { color: var(--oc-muted, #777); font-size: .85rem; }
+      #refresh { grid-column: 2; grid-row: 1 / span 2; }
+      .oc-sdk-btn { border-radius: var(--oc-radius, 6px); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <strong id="credit">Connecting…</strong>
+      <span id="detail">Available credit · Auto-top-up: Unknown</span>
+      <div id="refresh"></div>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>
