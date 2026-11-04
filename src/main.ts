@@ -2,6 +2,7 @@ import { connectHost } from "@openchamber/sdk";
 import { applyHostReady, mountButton } from "@openchamber/sdk/ui";
 import { CreditRefresh, type ViewState } from "./refresh.ts";
 import { observeAdaptiveHeight } from "./adaptive-height.ts";
+import { statusMetadata } from "./metadata.ts";
 
 const host = connectHost();
 const creditNode = document.querySelector<HTMLElement>("#credit")!;
@@ -19,17 +20,14 @@ const layout = observeAdaptiveHeight(document.querySelector<HTMLElement>("main")
 function render(state: ViewState): void {
   if (state.kind === "disconnected") {
     creditNode.textContent = "Not connected";
-    detailNode.textContent = "Auto-top-up: Unknown · Connect Vast.ai in Settings → Integrations.";
   } else if (state.kind === "loading") {
     creditNode.textContent = state.previous === undefined ? "Loading…" : `${money.format(state.previous)} · refreshing`;
-    detailNode.textContent = `Auto-top-up: Unknown · ${state.lastSuccess ? `Last successful refresh ${new Date(state.lastSuccess).toLocaleTimeString()}` : "Available credit"}`;
   } else if (state.kind === "success") {
     creditNode.textContent = money.format(state.credit);
-    detailNode.textContent = `Auto-top-up: Unknown · Available credit · Updated ${new Date(state.lastSuccess).toLocaleTimeString()}`;
   } else {
     creditNode.textContent = state.previous === undefined ? (state.kind === "invalid" ? "Invalid credentials" : "Unavailable") : `${money.format(state.previous)} · Stale`;
-    detailNode.textContent = `Auto-top-up: Unknown · ${state.kind === "invalid" ? "Vast.ai rejected the key. Reconnect in Settings → Integrations." : "Could not refresh Vast.ai credit."}${state.lastSuccess ? ` Last successful refresh ${new Date(state.lastSuccess).toLocaleTimeString()}.` : ""}`;
   }
+  detailNode.textContent = statusMetadata(state);
   refreshButton.update({ disabled: state.kind === "disconnected" || state.kind === "loading" || state.kind === "invalid" });
   layout.measure();
 }
