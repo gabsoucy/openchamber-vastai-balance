@@ -1,0 +1,36 @@
+{
+  "name": "@gabsoucy/vastai-credit",
+  "version": "1.0.0",
+  "description": "Read-only Vast.ai credit in OpenChamber Work Status",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openchamber/sdk": "2.6.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "typescript": "^5.9.3"
+  },
+  "openchamber": {
+    "apiVersion": 1,
+    "engines": { "openchamber": ">=2.6.0" },
+    "contributes": {
+      "panel": { "id": "vastai-credit", "name": "Vast.ai Credit", "icon": "money-dollar-circle" },
+      "statusSection": { "entry": "status/index.html", "title": "Vast.ai Credit", "height": 116 },
+      "integration": {
+        "name": "Vast.ai",
+        "description": "Read your available Vast.ai account credit.",
+        "token": {
+          "apiOrigin": "https://console.vast.ai",
+          "account": { "path": "/api/v0/users/current/", "name": "username" },
+          "scheme": "bearer"
+        }
+      }
+    }
+  }
+}
