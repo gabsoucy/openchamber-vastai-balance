@@ -1,3 +1,4 @@
+import { HostRequestError } from "@openchamber/sdk";
 import { parseAccountCredit } from "./account.ts";
 
 export type ViewState =
@@ -32,6 +33,7 @@ export class CreditRefresh {
   private generation = 0;
   private lastSuccess?: number;
   private credit?: number;
+  private nativeCredentialRejected = false;
   constructor(
     host: Host,
     changed: (state: ViewState) => void,
@@ -46,8 +48,21 @@ export class CreditRefresh {
   }
 
   connection(connected: boolean, account: string): void {
+    if (!connected && this.nativeCredentialRejected) {
+      this.nativeCredentialRejected = false;
+      this.generation++;
+      this.stopTimer();
+      this.connected = false;
+      this.account = account;
+      this.credit = undefined;
+      this.lastSuccess = undefined;
+      this.setState({ kind: "invalid" });
+      return;
+    }
+    if (!connected) this.nativeCredentialRejected = false;
     const same = this.connected === connected && this.account === account;
     if (same) return;
+    if (connected) this.nativeCredentialRejected = false;
     this.generation++;
     this.stopTimer();
     const accountChanged = this.account !== account;
@@ -95,8 +110,19 @@ export class CreditRefresh {
         this.lastSuccess = this.clock();
         this.setState({ kind: "success", credit: parsed.credit, lastSuccess: this.lastSuccess });
       }
-    }).catch(() => {
-      if (generation === this.generation) this.setState({ kind: "unavailable", previous: this.credit, lastSuccess: this.lastSuccess });
+    }).catch((error: unknown) => {
+      if (generation !== this.generation) return;
+      if (error instanceof HostRequestError && error.code === "DISCONNECTED") {
+        this.nativeCredentialRejected = true;
+        this.generation++;
+        this.connected = false;
+        this.stopTimer();
+        this.credit = undefined;
+        this.lastSuccess = undefined;
+        this.setState({ kind: "invalid" });
+      } else {
+        this.setState({ kind: "unavailable", previous: this.credit, lastSuccess: this.lastSuccess });
+      }
     }).finally(() => {
       this.inFlight = false;
       if (generation !== this.generation && this.connected && this.env.visible()) this.refresh();

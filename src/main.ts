@@ -26,9 +26,9 @@ function render(state: ViewState): void {
     detailNode.textContent = `Auto-top-up: Unknown · Available credit · Updated ${new Date(state.lastSuccess).toLocaleTimeString()}`;
   } else {
     creditNode.textContent = state.previous === undefined ? (state.kind === "invalid" ? "Invalid credentials" : "Unavailable") : `${money.format(state.previous)} · Stale`;
-    detailNode.textContent = `Auto-top-up: Unknown · ${state.kind === "invalid" ? "Vast.ai rejected the connected key." : "Could not refresh Vast.ai credit."}${state.lastSuccess ? ` Last successful refresh ${new Date(state.lastSuccess).toLocaleTimeString()}.` : ""}`;
+    detailNode.textContent = `Auto-top-up: Unknown · ${state.kind === "invalid" ? "Vast.ai rejected the key. Reconnect in Settings → Integrations." : "Could not refresh Vast.ai credit."}${state.lastSuccess ? ` Last successful refresh ${new Date(state.lastSuccess).toLocaleTimeString()}.` : ""}`;
   }
-  refreshButton.update({ disabled: state.kind === "disconnected" || state.kind === "loading" });
+  refreshButton.update({ disabled: state.kind === "disconnected" || state.kind === "loading" || state.kind === "invalid" });
 }
 
 const refresh = new CreditRefresh(host, render);
