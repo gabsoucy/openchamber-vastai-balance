@@ -1,7 +1,7 @@
 {
   "name": "@gabsoucy/vastai-credit",
-  "version": "1.0.0",
-  "description": "Read-only Vast.ai credit in OpenChamber Work Status",
+  "version": "1.1.0",
+  "description": "Read-only Vast.ai credit and rented GPUs in OpenChamber Work Status",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -24,7 +24,7 @@
       "statusSection": { "entry": "status/index.html", "title": "Vast.ai Credit", "height": 116 },
       "integration": {
         "name": "Vast.ai",
-        "description": "Read your available Vast.ai account credit.",
+        "description": "Read your Vast.ai account credit and instances (read-only).",
         "token": {
           "apiOrigin": "https://console.vast.ai",
           "account": { "path": "/api/v0/users/current/", "name": "username" },

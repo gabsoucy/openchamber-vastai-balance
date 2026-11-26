@@ -1,10 +1,10 @@
 import { HostRequestError } from "@openchamber/sdk";
-import { parseAccountCredit } from "./account.ts";
+import { parseAccountCredit, type AutoTopUp } from "./account.ts";
 
 export type ViewState =
   | { kind: "disconnected" }
   | { kind: "loading"; previous?: number; lastSuccess?: number }
-  | { kind: "success"; credit: number; lastSuccess: number }
+  | { kind: "success"; credit: number; lastSuccess: number; autoTopUp: AutoTopUp }
   | { kind: "invalid"; previous?: number; lastSuccess?: number }
   | { kind: "unavailable"; previous?: number; lastSuccess?: number };
 
@@ -108,7 +108,7 @@ export class CreditRefresh {
         const parsed = parseAccountCredit(result.body);
         this.credit = parsed.credit;
         this.lastSuccess = this.clock();
-        this.setState({ kind: "success", credit: parsed.credit, lastSuccess: this.lastSuccess });
+        this.setState({ kind: "success", credit: parsed.credit, lastSuccess: this.lastSuccess, autoTopUp: parsed.autoTopUp });
       }
     }).catch((error: unknown) => {
       if (generation !== this.generation) return;

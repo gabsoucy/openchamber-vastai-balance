@@ -8,16 +8,46 @@
       body { margin: 0; color: var(--oc-fg, inherit); font-family: var(--oc-font, system-ui, sans-serif); }
       main { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; }
       #credit { font-size: 1.2rem; font-weight: 650; }
-      #detail { color: var(--oc-muted, #777); font-size: .85rem; }
-      #refresh { grid-column: 2; grid-row: 1 / span 2; }
-      .oc-sdk-btn { border-radius: var(--oc-radius, 6px); }
+      #detail, #topup { grid-column: 1 / -1; color: var(--oc-muted, #777); font-size: .75rem; }
+      #rentals { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto; gap: 0 12px; margin-top: 4px; font-size: .85rem; }
+      #gpus { overflow-wrap: anywhere; white-space: pre-line; }
+      #spend { grid-column: 1 / -1; color: var(--oc-muted, #777); }
+      #instances { align-self: start; margin-top: -2px; }
+      [hidden] { display: none !important; }
+      #refresh, #instances {
+        display: inline-grid; place-items: center; width: 24px; height: 24px; padding: 0;
+        border: 0; border-radius: var(--oc-radius, 6px); background: transparent;
+        color: var(--oc-muted, #777); cursor: pointer;
+      }
+      #refresh:hover:not(:disabled), #instances:hover { color: var(--oc-fg, inherit); background: var(--oc-hover, color-mix(in srgb, currentColor 10%, transparent)); }
+      #refresh:focus-visible, #instances:focus-visible { outline: 2px solid var(--oc-focus, currentColor); outline-offset: 1px; }
+      #refresh:disabled { cursor: default; opacity: .5; }
+      #refresh svg, #instances svg { width: 16px; height: 16px; }
+      #refresh.spinning svg { animation: spin 1s linear infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { #refresh.spinning svg { animation: none; } }
     </style>
   </head>
   <body>
     <main>
       <strong id="credit">Connecting…</strong>
+      <button id="refresh" type="button" aria-label="Refresh" title="Refresh" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 12a8 8 0 0 1-14.3 4.9"/><path d="M4 12a8 8 0 0 1 14.3-4.9"/>
+          <path d="M18.5 3v4.2h-4.2"/><path d="M5.5 21v-4.2h4.2"/>
+        </svg>
+      </button>
       <span id="detail">Waiting for connection…</span>
-      <div id="refresh"></div>
+      <div id="rentals" hidden>
+        <span id="gpus"></span>
+        <a id="instances" href="https://cloud.vast.ai/instances/" aria-label="Open your instances on Vast.ai" title="Open your instances on Vast.ai">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
+          </svg>
+        </a>
+        <span id="spend" hidden></span>
+      </div>
+      <span id="topup" hidden></span>
     </main>
     <script src="main.js"></script>
   </body>

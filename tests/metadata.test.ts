@@ -5,7 +5,7 @@ import { statusMetadata } from "../src/metadata.ts";
 const time = (timestamp: number) => `TIME-${timestamp}`;
 
 test("successful metadata contains only the successful update time", () => {
-  assert.equal(statusMetadata({ kind: "success", credit: 0, lastSuccess: 1234 }, time), "Updated TIME-1234");
+  assert.equal(statusMetadata({ kind: "success", credit: 0, lastSuccess: 1234, autoTopUp: { kind: "unknown" } }, time), "Updated TIME-1234");
 });
 
 test("loading preserves the last successful timestamp and actionable connection guidance", () => {

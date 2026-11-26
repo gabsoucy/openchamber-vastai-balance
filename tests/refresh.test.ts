@@ -49,7 +49,7 @@ test("avoids replay refetches and overlapping calls; supports manual/timed refre
   assert.equal(h.active, 1);
   assert.equal(h.timerCount, 1);
   h.finish(); await flush();
-  assert.deepEqual(h.states.at(-1), { kind: "success", credit: 0, lastSuccess: 1234 });
+  assert.deepEqual(h.states.at(-1), { kind: "success", credit: 0, lastSuccess: 1234, autoTopUp: { kind: "unknown" } });
   h.tick();
   assert.equal(h.active, 1);
   h.finish('{"credit":8}'); await flush();
@@ -66,7 +66,7 @@ test("account changes clear state and ignore obsolete in-flight responses", asyn
   h.finish('{"credit":55}', 200, 0); await flush();
   assert.equal(h.active, 1);
   h.finish('{"credit":4}', 200, 1); await flush();
-  assert.deepEqual(h.states.at(-1), { kind: "success", credit: 4, lastSuccess: 1234 });
+  assert.deepEqual(h.states.at(-1), { kind: "success", credit: 4, lastSuccess: 1234, autoTopUp: { kind: "unknown" } });
 });
 
 test("visibility stops periodic work, refreshes on return, and dispose ignores pending results", async () => {
@@ -95,7 +95,7 @@ test("does not overlap a request across hide/show and refreshes after the old re
   h.finish('{"credit":6}', 200, 1);
   await flush();
   assert.equal(h.maximum, 1);
-  assert.deepEqual(h.states.at(-1), { kind: "success", credit: 6, lastSuccess: 1234 });
+  assert.deepEqual(h.states.at(-1), { kind: "success", credit: 6, lastSuccess: 1234, autoTopUp: { kind: "unknown" } });
 });
 
 test("distinguishes invalid credentials and unavailable/malformed responses while retaining last success", async () => {
@@ -125,7 +125,7 @@ test("native DISCONNECTED rejection remains actionable after the ensuing disconn
   h.controller.connection(true, "user-a");
   assert.equal(h.states.at(-1)?.kind, "loading");
   h.finish('{"credit":2}'); await flush();
-  assert.deepEqual(h.states.at(-1), { kind: "success", credit: 2, lastSuccess: 1234 });
+  assert.deepEqual(h.states.at(-1), { kind: "success", credit: 2, lastSuccess: 1234, autoTopUp: { kind: "unknown" } });
 });
 
 test("explicit disconnect during a pending request stays ordinary and ignores its rejection", async () => {
